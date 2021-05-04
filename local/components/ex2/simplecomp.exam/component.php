@@ -85,6 +85,8 @@ if ($this->StartResultCache())
 			];
 		}
 	}
+	$minPrice = 999999999;
+	$maxPrice = 0;
 	$arAllProduct = [];
 	if (!empty($arAllSection))
 	{
@@ -109,9 +111,18 @@ if ($this->StartResultCache())
 		while ($arProduct = $resProducts->GetNext())
 		{
 			$productId = $arProduct['ID'];
+			$price = $arProduct['PROPERTY_PRICE_VALUE'];
+			if ($price < $minPrice)
+			{
+				$minPrice = $price;
+			}
+			if ($price > $maxPrice)
+			{
+				$maxPrice = $price;
+			}
 			$arAllProduct[$productId] = [
 				'NAME' => $arProduct['NAME'],
-				'PRICE' => $arProduct['PROPERTY_PRICE_VALUE'],
+				'PRICE' => $price,
 				'ARTNUMBER' => $arProduct['PROPERTY_ARTNUMBER_VALUE'],
 				'MATERIAL' => $arProduct['PROPERTY_MATERIAL_VALUE'],
 
@@ -131,12 +142,14 @@ if ($this->StartResultCache())
 	$arResult['ALL_PRODUCTS'] = $arAllProduct;
 	$arResult['ALL_SECTIONS'] = $arAllSection;
 	$arResult['COUNT_PRODUCTS'] = count($arAllProduct);
-
+	$arResult['MIN_PRICE'] = $minPrice;
+	$arResult['MAX_PRICE'] = $maxPrice;
 	$this->SetResultCacheKeys([
-			"COUNT_PRODUCTS"
-		]);
+		"COUNT_PRODUCTS",
+		"MIN_PRICE",
+		"MAX_PRICE"
+	]);
 	$this->includeComponentTemplate();
 }
-
-$APPLICATION->SetTitle(GetMessage('SET_TITLE').$arResult['COUNT_PRODUCTS']);
+$APPLICATION->SetTitle(GetMessage('SET_TITLE') . $arResult['COUNT_PRODUCTS']);
 ?>
