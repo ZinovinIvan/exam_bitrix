@@ -110,7 +110,16 @@ if ($this->StartResultCache(false, array($currentUser)))
 	$arResult['ITEMS'] = $arItems;
 	$arResult['ALL_NEWS'] = $arAllNews;
 	$arResult['COUNT_NEWS'] = count($arAllNews);
+	$res = CIBlock::GetByID($iblockNews);
+	$ar_res = $res->GetNext();
 
+	$this->AddIncludeAreaIcon(
+		array(
+			'URL' => '/bitrix/admin/iblock_element_edit.php?IBLOCK_ID='.$iblockNews.'&type='.$ar_res['IBLOCK_TYPE_ID'].'&lang=ru&ID=36&find_section_section=-1&WF=Y',
+			'TITLE' => GetMessage('IB_V_ADM'),
+			'IN_PARAMS_MENU' => true
+		)
+	);
 	$this->setResultCacheKeys(['COUNT_NEWS']);
 	$this->includeComponentTemplate();
 }
