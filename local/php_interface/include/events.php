@@ -2,10 +2,12 @@
 <?php
 const ID_IBLOCK_PRODUCT = 2;
 const ID_MANAGER_GROUP = 5;
+const ID_META_IBLOCK = 7;
 AddEventHandler("iblock", "OnBeforeIBlockElementUpdate", "OnBeforeIBlockElementUpdateHandler");
 AddEventHandler("main", "OnEpilog", "OnEpilog");
 AddEventHandler("main", "OnBeforeEventAdd", "OnBeforeEventAddHandler");
 AddEventHandler("main", "OnBuildGlobalMenu", "OnBuildGlobalMenu");
+AddEventHandler("main", "OnPageStart", "OnPageStart");
 function OnBeforeIBlockElementUpdateHandler(&$arFields)
 {
 	if ((int)$arFields['IBLOCK_ID'] === ID_IBLOCK_PRODUCT && $arFields['ACTIVE'] === 'N')
@@ -111,5 +113,35 @@ function OnBuildGlobalMenu(&$aGlobalMenu, &$aModuleMenu)
 				unset($aModuleMenu[$key]);
 			}
 		}
+	}
+}
+
+function OnPageStart()
+{
+	CModule::IncludeModule("iblock");
+	global $APPLICATION;
+	$curPage = $APPLICATION->GetCurPage();
+	if ($curPage === '/bitrix/admin/')
+	{
+		return;
+	}
+	$res = CIBlockElement::GetList(
+		[],
+		[
+			'IBLOCK_ID' => ID_META_IBLOCK,
+			'NAME' => $curPage
+		],
+		false,
+		false,
+		[
+			'ID',
+			'PROPERTY_TITLE',
+			'PROPERTY_DESCRIPTION'
+		]
+	);
+	if ($element = $res->Fetch())
+	{
+		$APPLICATION->SetPageProperty('title', $element['PROPERTY_TITLE_VALUE']);
+		$APPLICATION->SetPageProperty('description', $element['PROPERTY_DESCRIPTION_VALUE']);
 	}
 }
