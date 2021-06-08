@@ -2,10 +2,10 @@
 <?php
 const ID_IBLOCK_PRODUCT = 2;
 AddEventHandler("iblock", "OnBeforeIBlockElementUpdate", "OnBeforeIBlockElementUpdateHandler");
-
+AddEventHandler("main", "OnEpilog", "OnEpilog");
 function OnBeforeIBlockElementUpdateHandler(&$arFields)
 {
-	if ((int)$arFields['IBLOCK_ID'] === ID_IBLOCK_PRODUCT && $arFields['ACTIVE']==='N')
+	if ((int)$arFields['IBLOCK_ID'] === ID_IBLOCK_PRODUCT && $arFields['ACTIVE'] === 'N')
 	{
 		$idElement = $arFields['ID'];
 		$res = CIBlockElement::GetList(
@@ -25,14 +25,35 @@ function OnBeforeIBlockElementUpdateHandler(&$arFields)
 		);
 		while ($ob = $res->Fetch())
 		{
-			if (!empty($ob)){
+			if (!empty($ob))
+			{
 				global $APPLICATION;
-				$APPLICATION->ThrowException(GetMessage('ERROR_DEACTIVE_PRODUCT',[
-					'#COUNT#'=>$ob['SHOW_COUNTER']
+				$APPLICATION->ThrowException(GetMessage('ERROR_DEACTIVE_PRODUCT', [
+					'#COUNT#' => $ob['SHOW_COUNTER']
 				]));
 				return false;
 			}
 		}
 	}
 	return true;
+}
+
+function OnEpilog()
+{
+	if (defined('ERROR_404') && ERROR_404 === 'Y')
+	{
+		global $APPLICATION;
+		$curUri = $APPLICATION->GetCurUri();
+		CEventLog::Add(array(
+			"SEVERITY" => "INFO",
+			"AUDIT_TYPE_ID" => "ERROR_404",
+			"MODULE_ID" => "main",
+			"DESCRIPTION" => $curUri
+		));
+		$APPLICATION->RestartBuffer();
+		include $_SERVER['DOCUMENT_ROOT'] . SITE_TEMPLATE_PATH.'/header.php';
+		include $_SERVER['DOCUMENT_ROOT'] . '/404.php';
+		include $_SERVER['DOCUMENT_ROOT'] . SITE_TEMPLATE_PATH.'/footer.php';
+
+	}
 }
