@@ -3,6 +3,7 @@
 const ID_IBLOCK_PRODUCT = 2;
 AddEventHandler("iblock", "OnBeforeIBlockElementUpdate", "OnBeforeIBlockElementUpdateHandler");
 AddEventHandler("main", "OnEpilog", "OnEpilog");
+AddEventHandler("main", "OnBeforeEventAdd", "OnBeforeEventAddHandler");
 function OnBeforeIBlockElementUpdateHandler(&$arFields)
 {
 	if ((int)$arFields['IBLOCK_ID'] === ID_IBLOCK_PRODUCT && $arFields['ACTIVE'] === 'N')
@@ -51,9 +52,39 @@ function OnEpilog()
 			"DESCRIPTION" => $curUri
 		));
 		$APPLICATION->RestartBuffer();
-		include $_SERVER['DOCUMENT_ROOT'] . SITE_TEMPLATE_PATH.'/header.php';
+		include $_SERVER['DOCUMENT_ROOT'] . SITE_TEMPLATE_PATH . '/header.php';
 		include $_SERVER['DOCUMENT_ROOT'] . '/404.php';
-		include $_SERVER['DOCUMENT_ROOT'] . SITE_TEMPLATE_PATH.'/footer.php';
+		include $_SERVER['DOCUMENT_ROOT'] . SITE_TEMPLATE_PATH . '/footer.php';
 
+	}
+}
+
+function OnBeforeEventAddHandler(&$event, &$lid, &$arFields)
+{
+	if ($event === 'FEEDBACK_FORM')
+	{
+		global $USER;
+		if ($USER->IsAuthorized())
+		{
+			$arFields['AUTHOR'] = GetMessage('AUTH_USER', [
+				'#ID#' => $USER->GetID(),
+				'#LOGIN#' => $USER->GetLogin(),
+				'#NAME#' => $USER->GetFullName(),
+				'#AUTHOR#' => $arFields['AUTHOR']
+			]);
+		} else
+		{
+			$arFields['AUTHOR'] = GetMessage('NOAUTH_USER', [
+				'#AUTHOR#' => $arFields['AUTHOR']
+			]);
+		}
+		CEventLog::Add(array(
+			"SEVERITY" => "INFO",
+			"AUDIT_TYPE_ID" => "FEEDBACK_FORM",
+			"MODULE_ID" => "main",
+			"DESCRIPTION" => GetMessage("DESCRIPTION_MESSAGE_LOG",[
+				"#AUTHOR#"=>$arFields['AUTHOR']
+			])
+		));
 	}
 }
