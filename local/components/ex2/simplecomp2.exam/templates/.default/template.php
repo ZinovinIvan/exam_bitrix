@@ -12,7 +12,8 @@
 			{
 			foreach($section["ELEMENTS_ID"] as $elem)
 			{
-			?><li><?=$arResult["ELEMENTS"][$elem]["NAME"]?> - <?=$arResult["ELEMENTS"][$elem]["PROP"]["PRICE"]["VALUE"]?> - <?=$arResult["ELEMENTS"][$elem]["PROP"]["MATERIAL"]["VALUE"]?><?
+			?><li><?=$arResult["ELEMENTS"][$elem]["NAME"]?> - <?=$arResult["ELEMENTS"][$elem]["PROP"]["PRICE"]["VALUE"]?> - <?=$arResult["ELEMENTS"][$elem]["PROP"]["MATERIAL"]["VALUE"]?>
+				(<?=$arResult["ELEMENTS"][$elem]["LINK_TEMPLATE"]?>)<?
 				}
 				}
 				?>
