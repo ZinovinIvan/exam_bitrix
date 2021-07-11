@@ -5,7 +5,7 @@ use Bitrix\Main\Loader;
 
 global $USER;
 global $APPLICATION;
-if ($this->startResultCache(false, array($USER->GetGroups())))
+if ($this->startResultCache(false, [$USER->GetGroups()]))
 {
 	if (!Loader::includeModule("iblock"))
 	{
@@ -14,21 +14,21 @@ if ($this->startResultCache(false, array($USER->GetGroups())))
 	}
 
 	if (intval($arParams["PRODUCTS_IBLOCK_ID"]) > 0
-	&& intval($arParams["NEWS_IBLOCK_ID"]) > 0
-	&& !empty($arParams["CODE_PROPERTY_NEWS"]))
+		&& intval($arParams["NEWS_IBLOCK_ID"]) > 0
+		&& !empty($arParams["CODE_PROPERTY_NEWS"]))
 	{
 		$news = [];
 		$newsIds = [];
-		$arSelectElems = array(
+		$arSelectElems = [
 			"ID",
 			"ACTIVE_FROM",
 			"NAME",
-		);
-		$arFilterElems = array(
+		];
+		$arFilterElems = [
 			"IBLOCK_ID" => $arParams["NEWS_IBLOCK_ID"],
-			"ACTIVE" => "Y"
-		);
-		$arSortElems = array();
+			"ACTIVE" => "Y",
+		];
+		$arSortElems = [];
 
 		$rsElements = CIBlockElement::GetList(
 			$arSortElems,
@@ -44,19 +44,19 @@ if ($this->startResultCache(false, array($USER->GetGroups())))
 		}
 
 
-		$arSelectSect = array(
+		$arSelectSect = [
 			"ID",
 			"IBLOCK_ID",
 			"NAME",
-			$arParams['CODE_PROPERTY_NEWS']
-		);
-		$arFilterSect = array(
+			$arParams['CODE_PROPERTY_NEWS'],
+		];
+		$arFilterSect = [
 			"IBLOCK_ID" => $arParams["PRODUCTS_IBLOCK_ID"],
 			"ACTIVE" => "Y",
 			$arParams['CODE_PROPERTY_NEWS'] => $newsIds,
-			'CNT_ACTIVE'
-		);
-		$arSortSect = array();
+			'CNT_ACTIVE',
+		];
+		$arSortSect = [];
 		$sectionIds = [];
 		$sectionList = [];
 		$rsSections = CIBlockSection::GetList(
@@ -71,13 +71,13 @@ if ($this->startResultCache(false, array($USER->GetGroups())))
 			$sectionIds[] = $arSection['ID'];
 			$sectionList[$arSection['ID']] = $arSection;
 		}
-
+		$arAllPrice = [];
 		$products = \CIBlockElement::GetList(
 			[],
 			[
 				'IBLOCK_ID' => $arParams['PRODUCT_IBLOCK_ID'],
 				'ACTIVE' => 'Y',
-				'SECTION_ID' => $sectionIds
+				'SECTION_ID' => $sectionIds,
 			],
 			false,
 			false,
@@ -88,7 +88,7 @@ if ($this->startResultCache(false, array($USER->GetGroups())))
 				'IBLOCK_ID',
 				'PROPERTY_ARTNUMBER',
 				'PROPERTY_MATERIAL',
-				'PROPERTY_PRICE'
+				'PROPERTY_PRICE',
 			]
 		);
 		while ($product = $products->Fetch())
@@ -97,6 +97,7 @@ if ($this->startResultCache(false, array($USER->GetGroups())))
 			{
 				$news[$newsId]['PRODUCTS'][] = $product;
 			}
+			$arAllPrice[] = $product['PROPERTY_PRICE_VALUE'];
 		}
 		$arResult['PRODUCT_CNT'] = 0;
 		foreach ($sectionList as $section)
@@ -107,13 +108,24 @@ if ($this->startResultCache(false, array($USER->GetGroups())))
 				$news[$newsId]['SECTIONS'][] = $section['NAME'];
 			}
 		}
+		$arResult["MIN_PRICE"] = min($arAllPrice);
+
+		$arResult["MAX_PRICE"] = max($arAllPrice);
+		$APPLICATION->AddViewContent(
+			"min_price",
+			"Минимальная цена:" . $arResult["MIN_PRICE"]
+		);
+		$APPLICATION->AddViewContent(
+			"max_price",
+			"Максимальная цена:". $arResult["MAX_PRICE"]
+		);
 		$arResult['NEWS'] = $news;
-		$this->SetResultCacheKeys(array('PRODUCT_CNT'));
+		$this->SetResultCacheKeys(['PRODUCT_CNT']);
 		$this->includeComponentTemplate();
 	}
 } else
 {
 	$this->abortResultCache();
 }
-$APPLICATION->SetTitle(GetMessage('COUNT_CATALOG_PRODUCT').$arResult['PRODUCT_CNT']);
+$APPLICATION->SetTitle(GetMessage('COUNT_CATALOG_PRODUCT') . $arResult['PRODUCT_CNT']);
 ?>
