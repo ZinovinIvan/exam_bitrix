@@ -23,3 +23,5 @@
 	}
 	?>
 </ul>
+<? $sCurPage = $APPLICATION->GetCurPage() . "?F=Y"; ?>
+Тест фильтра: <a href="<?= $sCurPage ?>"><?= $sCurPage ?></a>

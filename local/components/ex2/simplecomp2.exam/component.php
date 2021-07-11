@@ -10,9 +10,15 @@ if (!isset($arParams["CACHE_TIME"]))
 	$arParams["CACHE_TIME"] = 36000000;
 }
 
+$request = \Bitrix\Main\Application::getInstance()->getContext()->getRequest();
+$bFilter = false;
+if ($request->get('F'))
+{
+	$bFilter = true;
+}
 
 global $USER;
-if ($this->startResultCache(false, [$USER->GetGroups()]))
+if ($this->startResultCache(false, [$USER->GetGroups()], $bFilter))
 {
 	if (!Loader::includeModule("iblock"))
 	{
@@ -56,6 +62,7 @@ if ($this->startResultCache(false, [$USER->GetGroups()]))
 		"CODE",
 	];
 
+
 	$arFilterElems = [
 		"IBLOCK_ID" => $arParams["PRODUCT_IBLOCK_ID"],
 		"CHECK_PERMISSIONS" => "Y",
@@ -63,6 +70,20 @@ if ($this->startResultCache(false, [$USER->GetGroups()]))
 		"ACTIVE" => "Y",
 	];
 
+	if ($bFilter)
+	{
+		$arFilterElems[] = [
+			"LOGIC" => "OR",
+			[
+				"<=PROPERTY_PRICE" => "1700",
+				"PROPERTY_MATERIAL" => "Дерево, ткань",
+			],
+			[
+				"<PROPERTY_PRICE" => "1500",
+				"PROPERTY_MATERIAL" => "Металл, пластик",
+			],
+		];
+	}
 	$arSortElems = [
 		'NAME' => 'ASC', 'SORT' => 'ASC',
 	];
@@ -70,7 +91,12 @@ if ($this->startResultCache(false, [$USER->GetGroups()]))
 
 	$arResult["ELEMENTS"] = [];
 
-	$rsElement = CIBlockElement::GetList($arSortElems, $arFilterElems, false, false, $arSelectElems);
+	$rsElement = CIBlockElement::GetList(
+		$arSortElems,
+		$arFilterElems,
+		false,
+		false,
+		$arSelectElems);
 
 	while ($rsElem = $rsElement->GetNextElement())
 	{
