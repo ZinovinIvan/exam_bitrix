@@ -30,9 +30,10 @@ if ($USER->IsAuthorized())
 		["ID" => $USER->GetId()],
 		["SELECT" => [$arParams["FIELD_AUTHOR_CODE"]]]
 	)->Fetch()[$arParams["FIELD_AUTHOR_CODE"]];
+	global $CACHE_MANAGER;
 	if ($this->startResultCache(false, $currentUserType) && !empty($currentUserType))
 	{
-
+		$CACHE_MANAGER->RegisterTag('iblock_id_3');
 		$users = \CUser::GetList(
 			($by = "id"),
 			($order = "desc"),
@@ -80,6 +81,7 @@ if ($USER->IsAuthorized())
 			$arResult["COUNT"] = $newsCount;
 			$this->SetResultCacheKeys(["COUNT"]);
 			$this->IncludeComponentTemplate();
+			$this->endResultCache();
 		}
 	} else
 	{
