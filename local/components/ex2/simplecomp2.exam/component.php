@@ -26,6 +26,21 @@ if ($this->startResultCache(false, [$USER->GetGroups()], $bFilter))
 		return;
 	}
 
+	if ($USER->IsAuthorized() && CModule::includeModule("iblock"))
+	{
+		$arButtons = CIBlock::GetPanelButtons($arParams["PRODUCT_IBLOCK_ID"]);
+		$this->AddIncludeAreaIcons(
+			[
+				[
+					"ID" => "linkIb",
+					"TITLE" => "ИБ в админке",
+					"URL" => $arButtons['submenu']['element_list']['ACTION_URL'],
+					"IN_PARAMS_MENU" => true,
+				],
+			]
+		);
+	}
+
 	$arSelectСlassifier = [
 		"ID",
 		"IBLOCK_ID",
