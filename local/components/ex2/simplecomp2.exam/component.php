@@ -16,9 +16,9 @@ if ($request->get('F'))
 {
 	$bFilter = true;
 }
-
+$arNavigation = CDBResult::GetNavParams($arNavParams);
 global $USER;
-if ($this->startResultCache(false, [$USER->GetGroups()], $bFilter))
+if ($this->startResultCache(false, [$USER->GetGroups(), $arNavigation], $bFilter))
 {
 	if (!Loader::includeModule("iblock"))
 	{
@@ -58,7 +58,9 @@ if ($this->startResultCache(false, [$USER->GetGroups()], $bFilter))
 		false,
 		$arFilterСlassifier,
 		false,
-		false,
+		[
+			"nPageSize" => $arParams['COUNT_ELS'],
+		],
 		$arSelectСlassifier
 	);
 	while ($arElement = $rsElement_link->GetNext())
@@ -66,6 +68,7 @@ if ($this->startResultCache(false, [$USER->GetGroups()], $bFilter))
 		$arResult["CLASSIFIER_ID"][] = $arElement["ID"];
 		$arResult["CLASSIFIER"][$arElement["ID"]] = $arElement;
 	}
+	$arResult["NAV_STRING"] = $rsElement_link->GetPageNavString("Странички");
 	$arResult["COUNT_CLASS"] = count($arResult["CLASSIFIER"]);
 
 	$arSelectElems = [

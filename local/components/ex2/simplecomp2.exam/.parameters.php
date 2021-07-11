@@ -18,6 +18,10 @@ $arComponentParameters = [
 			"NAME" => GetMessage("SIMPLECOMP_EXAM2_LINK_TEMPLATE"),
 			"TYPE" => "STRING",
 		],
+		"COUNT_ELS" => [
+			"NAME" => GetMessage("SIMPLECOMP_EXAM2_COUNT_ELS"),
+			"TYPE" => "STRING",
+		],
 		"CACHE_TIME" => ["DEFAULT" => 3600],
 	],
 ];
