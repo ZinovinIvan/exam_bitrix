@@ -5,7 +5,7 @@ $APPLICATION->SetTitle("Форма обратной связи");
 	"bitrix:main.feedback",
 	"",
 	Array(
-		"EMAIL_TO" => "i.zinovin@mail.ru",
+		"EMAIL_TO" => "zinovin@i-pusk.ru",
 		"EVENT_MESSAGE_ID" => array(),
 		"OK_TEXT" => "Спасибо, ваше сообщение принято.",
 		"REQUIRED_FIELDS" => array(),
