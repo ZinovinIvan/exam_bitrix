@@ -13,10 +13,11 @@ if ($this->startResultCache(false, [$USER->GetGroups()]))
 		return;
 	}
 
-	if (intval($arParams["PRODUCTS_IBLOCK_ID"]) > 0
-		&& intval($arParams["NEWS_IBLOCK_ID"]) > 0
+	if ((int)$arParams["PRODUCTS_IBLOCK_ID"] > 0
+		&& (int)$arParams["NEWS_IBLOCK_ID"] > 0
 		&& !empty($arParams["CODE_PROPERTY_NEWS"]))
 	{
+		$arResult["IBLOCK_ID"] = $arParams["PRODUCTS_IBLOCK_ID"];
 		$news = [];
 		$newsIds = [];
 		$arSelectElems = [
@@ -93,6 +94,14 @@ if ($this->startResultCache(false, [$USER->GetGroups()]))
 		);
 		while ($product = $products->Fetch())
 		{
+			$arButtons = CIBlock::GetPanelButtons(
+				$product["IBLOCK_ID"],
+				$product["ID"],
+				0,
+				array("SECTION_BUTTONS" => false, "SESSID" => false)
+			);
+			$product["EDIT_LINK"] = $arButtons["edit"]["edit_element"]["ACTION_URL"];
+			$product["DELETE_LINK"] = $arButtons["edit"]["delete_element"]["ACTION_URL"];
 			foreach ($sectionList[$product['IBLOCK_SECTION_ID']]['UF_NEWS_LINK'] as $newsId)
 			{
 				$news[$newsId]['PRODUCTS'][] = $product;
@@ -117,9 +126,16 @@ if ($this->startResultCache(false, [$USER->GetGroups()]))
 		);
 		$APPLICATION->AddViewContent(
 			"max_price",
-			"Максимальная цена:". $arResult["MAX_PRICE"]
+			"Максимальная цена:" . $arResult["MAX_PRICE"]
 		);
 		$arResult['NEWS'] = $news;
+		$arButtons = CIBlock::GetPanelButtons(
+			$arParams["PRODUCTS_IBLOCK_ID"],
+			0,
+			0,
+			array("SECTION_BUTTONS"=>false, "SESSID"=>false)
+		);
+		$arResult["ADD_ELEMENT_LINK"] = $arButtons["edit"]["add_element"]["ACTION_URL"];
 		$this->SetResultCacheKeys(['PRODUCT_CNT']);
 		$this->includeComponentTemplate();
 	}
