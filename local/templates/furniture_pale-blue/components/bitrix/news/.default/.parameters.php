@@ -10,5 +10,10 @@ $arTemplateParameters=[
 		"NAME" => GetMessage("NAME_ID_IBLOCK_CANNONICAL"),
 		"TYPE" => "STRING",
 		"DEFAULT" => "",
+	],
+	"SET_AJAX_ZALOBA"=>[
+		"NAME" => GetMessage("NAME_SET_AJAX_ZALOBA"),
+		"TYPE" => "CHECKBOX",
+		"DEFAULT" => "N",
 	]
 ];
