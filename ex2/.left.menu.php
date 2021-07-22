@@ -27,6 +27,20 @@ $aMenuLinks = Array(
 		Array(), 
 		Array(), 
 		"" 
+	),
+	Array(
+		"Комплексный компонент", 
+		"/ex2/complexcomponent/", 
+		Array(), 
+		Array(), 
+		"" 
+	),
+	Array(
+		"Второй сайт",
+		"/ex2/site2/",
+		Array(),
+		Array(),
+		""
 	)
 );
 ?>
